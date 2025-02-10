@@ -159,7 +159,8 @@ runs:
         if ${{ inputs.nsis == true }}; then
           build_options+=' -nsis'
         fi
-        echo "BUILD_OPTIONS=$build_options" >> "$GITHUB_OUTPUT"
+#        echo "BUILD_OPTIONS=$build_options" >> "$GITHUB_OUTPUT"
+         echo "::set-output name=BUILD_OPTIONS::$build_options"
     # Setup and configure GoLang
     - name: Setup GoLang
       uses: actions/setup-go@v5
@@ -204,10 +205,8 @@ runs:
     # Building step
     - name: Build App
       if: inputs.build == 'true'
-      env:
-        BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} ${{steps.build_options.outputs.BUILD_OPTIONS}}
       shell: bash
     - name: Add macOS perms
       if: inputs.build == 'true' && runner.os == 'macOS'
