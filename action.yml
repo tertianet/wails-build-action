@@ -216,7 +216,7 @@ runs:
     # install wails
     - name: Install Wails
       if: inputs.build == 'true'
-      run: go install github.com/tertianet/wails/v2/cmd/wails@ef18dea90ba573a70f730ea7b65856107ac62269
+      run: go install github.com/tertianet/wails/v2/cmd/wails@a4d0f7e180945ffccee5890dabc781b8837f2874
       shell: bash
     - name: Install macOS Wails deps
       if: runner.os == 'macOS'
@@ -231,7 +231,7 @@ runs:
       run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
       shell: bash
     # Sign Windows in AZURE cloud
-    - name: Sign Windows Installer
+    - name: Sign Windows binary
       if: runner.os == 'Windows' && inputs.sign == 'cloud'
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
