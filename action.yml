@@ -115,6 +115,26 @@ inputs:
     description: "Windows Signing Certificate Password"
     required: false
     default: ''
+  sign-windows-AZURE_KEY_VAULT_URI:
+    description: ""
+    required: false
+    default: ''
+  sign-windows-AZURE_CLIENT_ID:
+    description: ""
+    required: false
+    default: ''
+  sign-windows-AZURE_TENANT_ID:
+    description: ""
+    required: false
+    default: ''
+  sign-windows-AZURE_CLIENT_SECRET:
+    description: ""
+    required: false
+    default: ''
+  sign-windows-AZURE_CERT_NAME:
+    description: ""
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -217,7 +237,7 @@ runs:
       shell: bash
       run: |
         dotnet tool install --global AzureSignTool 
-        AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}.exe
+        AzureSignTool sign -kvu "${{ inputs.sign-windows-AZURE_KEY_VAULT_URI }}" -kvi "${{ inputs.sign-windows-AZURE_CLIENT_ID }}" -kvt "${{ inputs.sign-windows-AZURE_TENANT_ID }}" -kvs "${{ inputs.sign-windows-AZURE_CLIENT_SECRET }}" -kvc "${{ inputs.sign-windows-AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}.exe
 
     - name: Build Windows installer
       if: runner.os == 'Windows' && inputs.build == 'true'
@@ -233,7 +253,7 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
-        AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}-amd64-installer.exe
+        AzureSignTool sign -kvu "${{ inputs.sign-windows-AZURE_KEY_VAULT_URI }}" -kvi "${{ inputs.sign-windows-AZURE_CLIENT_ID }}" -kvt "${{ inputs.sign-windows-AZURE_TENANT_ID }}" -kvs "${{ inputs.sign-windows-AZURE_CLIENT_SECRET }}" -kvc "${{ inputs.sign-windows-AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}-amd64-installer.exe
 
     - name: Add macOS perms
       if: inputs.build == 'true' && runner.os == 'macOS'
