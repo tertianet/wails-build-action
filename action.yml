@@ -196,7 +196,7 @@ runs:
     # install wails
     - name: Install Wails
       if: inputs.build == 'true'
-      run: go install github.com/wailsapp/wails/v2/cmd/wails@${{inputs.wails-version}}
+      run: go install github.com/tertianet/wails/v2/cmd/wails@72c88a532d6f21782d31e92513205edbd80932c7
       shell: bash
     - name: Install macOS Wails deps
       if: runner.os == 'macOS'
@@ -210,6 +210,31 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
       shell: bash
+    # Sign Windows in AZURE cloud
+    - name: Sign Windows Installer
+      if: runner.os == 'Windows' && inputs.sign == 'cloud'
+      working-directory: ${{ inputs.app-working-directory }}
+      shell: bash
+      run: |
+        dotnet tool install --global AzureSignTool 
+        AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}.exe
+
+    - name: Build Windows installer
+      if: runner.os == 'Windows' && inputs.build == 'true'
+      env:
+        BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
+      working-directory: ${{ inputs.app-working-directory }}
+      run: wails build-nsis --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
+      shell: bash
+
+    # Sign Windows installer in AZURE cloud
+    - name: Sign Windows Installer
+      if: runner.os == 'Windows' && inputs.sign == 'cloud'
+      working-directory: ${{ inputs.app-working-directory }}
+      shell: bash
+      run: |
+        AzureSignTool sign -kvu "${{ secrets.AZURE_KEY_VAULT_URI }}" -kvi "${{ secrets.AZURE_CLIENT_ID }}" -kvt "${{ secrets.AZURE_TENANT_ID }}" -kvs "${{ secrets.AZURE_CLIENT_SECRET }}" -kvc "${{ secrets.AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}-amd64-installer.exe
+
     - name: Add macOS perms
       if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
@@ -284,7 +309,6 @@ runs:
         echo "Signing our binaries"
         & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe' sign /fd sha256 /tr http://ts.ssl.com /f certificate\certificate.pfx /p '${{ inputs.sign-windows-cert-password }}' .\build\bin\${{inputs.build-name}}.exe
         echo "Signing Installer" & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe' sign /fd sha256 /tr http://ts.ssl.com /f certificate\certificate.pfx /p '${{ inputs.sign-windows-cert-password }}' .\build\bin\${{inputs.build-name}}-amd64-installer.exe
-
     # Upload build assets
     - uses: actions/upload-artifact@v4
       if: inputs.package == 'true'
