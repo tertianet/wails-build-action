@@ -216,7 +216,7 @@ runs:
     # install wails
     - name: Install Wails
       if: inputs.build == 'true'
-      run: go install github.com/tertianet/wails/v2/cmd/wails@1fd939568f5f42b1f3b3608e6c055111852c8b85
+      run: go install github.com/tertianet/wails/v2/cmd/wails@6957af94e70741f389f598f96f0251a1b3dc49fc
       shell: bash
     - name: Install macOS Wails deps
       if: runner.os == 'macOS'
