@@ -20,6 +20,10 @@ inputs:
     description: "Sign the build"
     required: false
     default: "false"
+  sign-windows-AZURE:
+    description: "Sign Windows build with Azure cloud cert"
+    required: false
+    default: "false"
   package:
     description: "Uploads workflow & uploads tag builds to a release"
     required: false
@@ -232,7 +236,7 @@ runs:
       shell: bash
     # Sign Windows in AZURE cloud
     - name: Sign Windows binary
-      if: runner.os == 'Windows' && inputs.sign == 'cloud'
+      if: runner.os == 'Windows' && inputs.sign-windows-AZURE == 'true'
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
@@ -251,7 +255,7 @@ runs:
 
     # Sign Windows installer in AZURE cloud
     - name: Sign Windows Installer
-      if: runner.os == 'Windows' && inputs.sign == 'cloud'
+      if: runner.os == 'Windows' && inputs.sign-windows-AZURE == 'true'
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
