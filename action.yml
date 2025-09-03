@@ -1,8 +1,8 @@
 name: "Wails Build Action"
 description: "Creates a wails binary"
 branding:
-  icon: 'box'
-  color: 'purple'
+  icon: "box"
+  color: "purple"
 inputs:
   build:
     description: "Platform to build for"
@@ -86,59 +86,59 @@ inputs:
   sign-macos-app-id:
     description: "MacOS Application Certificate id"
     required: false
-    default: ''
+    default: ""
   sign-macos-apple-password:
     description: "MacOS Apple password"
     required: false
-    default: ''
+    default: ""
   sign-macos-app-cert:
     description: "MacOS Application Certificate"
     required: false
-    default: ''
+    default: ""
   sign-macos-app-cert-password:
     description: "MacOS Application Certificate Password"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-id:
     description: "MacOS Installer Certificate id"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-cert:
     description: "MacOS Installer Certificate"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-cert-password:
     description: "MacOS Installer Certificate Password"
     required: false
-    default: ''
+    default: ""
   sign-windows-cert:
     description: "Windows Signing Certificate"
     required: false
-    default: ''
+    default: ""
   sign-windows-cert-password:
     description: "Windows Signing Certificate Password"
     required: false
-    default: ''
+    default: ""
   sign-windows-AZURE_KEY_VAULT_URI:
     description: ""
     required: false
-    default: ''
+    default: ""
   sign-windows-AZURE_CLIENT_ID:
     description: ""
     required: false
-    default: ''
+    default: ""
   sign-windows-AZURE_TENANT_ID:
     description: ""
     required: false
-    default: ''
+    default: ""
   sign-windows-AZURE_CLIENT_SECRET:
     description: ""
     required: false
-    default: ''
+    default: ""
   sign-windows-AZURE_CERT_NAME:
     description: ""
     required: false
-    default: ''
+    default: ""
 
 runs:
   using: "composite"
@@ -191,7 +191,7 @@ runs:
       with:
         check-latest: true
         cache: ${{ inputs.build-cache }}
-        cache-dependency-path: 'go.sum'
+        cache-dependency-path: "go.sum"
         go-version: ${{ inputs.go-version }}
     - name: Install Garble
       if: inputs.build-obfuscate == 'true'
@@ -204,7 +204,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{inputs.node-version}}
-        cache: 'npm'
+        cache: "npm"
         cache-dependency-path: "**/package-lock.json"
     # (Optional) Setup and configure Deno
     - name: Setup Deno
@@ -242,14 +242,16 @@ runs:
       run: |
         dotnet tool install --global AzureSignTool 
         AzureSignTool sign -kvu "${{ inputs.sign-windows-AZURE_KEY_VAULT_URI }}" -kvi "${{ inputs.sign-windows-AZURE_CLIENT_ID }}" -kvt "${{ inputs.sign-windows-AZURE_TENANT_ID }}" -kvs "${{ inputs.sign-windows-AZURE_CLIENT_SECRET }}" -kvc "${{ inputs.sign-windows-AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}
+
     - name: Ensure DLL present
-    run: |
-      echo "Checking for gridnetlibamd64.dll..."
-      if [ ! -f build/bin/gridnetlibamd64.dll ]; then
-        echo "gridnetlibamd64.dll not found in build/bin/, copying..."
-        cp path/to/gridnetlibamd64.dll build/bin/
-      fi
-      ls -lha build/bin/
+      run: |
+        echo "Checking for gridnetlibamd64.dll..."
+        if [ ! -f build/bin/gridnetlibamd64.dll ]; then
+          echo "gridnetlibamd64.dll not found in build/bin/, copying..."
+          cp path/to/gridnetlibamd64.dll build/bin/
+        fi
+        ls -lha build/bin/
+      shell: bash
     - name: Build Windows installer
       if: runner.os == 'Windows' && inputs.build == 'true'
       env:
