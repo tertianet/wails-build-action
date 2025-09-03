@@ -249,7 +249,8 @@ runs:
         BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        ls
+        cp gridnetlibamd64.dll build/bin/
+
         ls -lha build/bin/
         wails build-nsis --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
         ls -lha build/bin/
