@@ -243,21 +243,14 @@ runs:
         dotnet tool install --global AzureSignTool 
         AzureSignTool sign -kvu "${{ inputs.sign-windows-AZURE_KEY_VAULT_URI }}" -kvi "${{ inputs.sign-windows-AZURE_CLIENT_ID }}" -kvt "${{ inputs.sign-windows-AZURE_TENANT_ID }}" -kvs "${{ inputs.sign-windows-AZURE_CLIENT_SECRET }}" -kvc "${{ inputs.sign-windows-AZURE_CERT_NAME }}" -tr http://timestamp.digicert.com -v build/bin/${{inputs.build-name}}
 
-    - name: Ensure DLL present
-      run: |
-        echo "Checking for gridnetlibamd64.dll..."
-        if [ ! -f build/bin/gridnetlibamd64.dll ]; then
-          echo "gridnetlibamd64.dll not found in build/bin/, copying..."
-          cp path/to/gridnetlibamd64.dll build/bin/
-        fi
-        ls -lha build/bin/
-      shell: bash
     - name: Build Windows installer
       if: runner.os == 'Windows' && inputs.build == 'true'
       env:
         BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
       working-directory: ${{ inputs.app-working-directory }}
       run: |
+        ls
+        ls -lha build/bin/
         wails build-nsis --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}  -ldflags '${{inputs.ldflags}}' ${{inputs.build-cli-params}} $BUILD_OPTIONS
         ls -lha build/bin/
       shell: bash
